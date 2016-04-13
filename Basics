@@ -1,0 +1,89 @@
+import pygame
+import sys
+from pygame.locals import *
+
+pygame.init()
+
+#Colors
+white = (255, 255, 255)
+black = (0, 0, 0)
+blue = (51, 199, 255, 196)
+bg = black
+
+FPS = 30
+dispWidth = 800
+dispHeight = 600
+cellSize = 10
+
+UP = 'up'
+DOWN = 'down'
+RIGHT = 'right'
+LEFT = 'left'
+
+def runGame():
+    startx = 10
+    starty = 10
+    coords = [{'x':startx, 'y':starty}]
+    direction = RIGHT
+    isAlive = 'yes'
+
+    while True:
+
+        while (isAlive == 'yes'):
+        
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+                elif event.type == KEYDOWN:
+                    if event.key == (K_LEFT or K_A):
+                        direction = LEFT
+                    elif event.key == (K_RIGHT or K_D):
+                        direction = RIGHT
+                    elif event.key == (K_UP or K_W):
+                        direction = UP
+                    elif event.key == (K_DOWN or K_S):
+                        direction = DOWN
+
+            if direction == UP:
+                newCell = {'x':coords[0]['x'], 'y':coords[0]['y']-1}
+            elif direction == DOWN:
+                newCell = {'x':coords[0]['x'], 'y':coords[0]['y']+1}
+            elif direction == LEFT:
+                newCell = {'x':coords[0]['x']-1, 'y':coords[0]['y']}
+            elif direction == RIGHT:
+                newCell = {'x':coords[0]['x']+1, 'y':coords[0]['y']}
+
+            del coords[-1]
+            
+            coords.insert(0, newCell)
+            setDisplay.fill(bg)
+            drawCell(coords)
+            pygame.display.update()
+            fpsTime.tick(FPS)
+
+            if (newCell['x'] < 0 or newCell['y'] < 0 or newCell['x'] > (dispWidth - cellSize) or newCell['y'] > (dispHeight - cellSize)):
+                isAlive = 'no'
+
+        print 'You Died'
+        pygame.quit()
+        sys.exit()
+
+def drawCell(coords):
+    for coord in coords:
+        x = coord['x']*cellSize
+        y = coord['y']*cellSize
+        makeCell = pygame.Rect(x, y, cellSize, cellSize)
+        pygame.draw.rect(setDisplay, white, makeCell)
+
+while True:
+    global fpsTime, setDisplay
+
+    fpsTime = pygame.time.Clock()
+    setDisplay = pygame.display.set_mode((dispWidth,dispHeight))
+    pygame.display.set_caption('Practice')
+    runGame()
+
+
+                    
