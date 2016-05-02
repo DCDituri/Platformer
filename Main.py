@@ -9,17 +9,25 @@ WINDOW = pygame.display.set_mode([800,600])
 pygame.display.set_caption("Aww Yeah!")
 
 #Colors
-black = (0,0,0)
+black = (0, 0, 0)
 white = (255, 255, 255)
+purple = (160, 32, 240, 155)
+blue = (51, 199, 255, 196)
+silver = (192, 192, 192, 192)
+scarlet = (255, 36, 0, 200)
+
+RIGHT = "right"
+LEFT = "left"
 
 running = True
 FPS = 60
+bulletCD = 0
 clock = pygame.time.Clock()
 
 step = 5
 gravity = -0.5
 gameLoop = True
-
+#############################PLAYER 1###############################################
 class Player(sprite.Sprite):
     def __init__ (self):
         sprite.Sprite.__init__(self)
@@ -32,8 +40,11 @@ class Player(sprite.Sprite):
         collisionLeft = False
         collisionDown = False
         collisionRIght = False
+        self.user = 1
+        self.direction = RIGHT
+        self.bulletCount = 0
         
-        self.image = pygame.image.load("beach.png")
+        self.image = pygame.image.load("Player1.png")
         self.rect = self.image.get_rect()
         self.width = self.image.get_width()
         self.height = self.image.get_height()
@@ -52,6 +63,101 @@ class Player(sprite.Sprite):
                         return True
                 else:
                         return False
+
+    def borders(self):
+        if (self.x + self.width) >= 768: #Right border
+            self.x = 768 - self.width
+            
+        elif self.x <= 32: #left border
+            self.x = 32
+
+        if self.y <= 32: #top border
+            self.y = 32
+            self.velocity = 0 #stops upward movement
+
+    def shoot(self):
+        bullet.shoot(1, self.direction)
+                                
+    def update(self):
+        if(self.velocity < 0):
+            self.falling = True
+
+        #Checking for Collisions
+        for block in blockList:
+            collisionDown = self.detectCollisionsDown(self.x, self.y, self.width, self.height, block.x, block.y, block.width, block.height)
+            if (collisionDown == True):
+                break
+
+        #Reacting to Collisions
+        if collisionDown == True:
+            if(self.falling == True): #only if falling
+                self.falling = False
+                self.onGround = True
+                self.velocity = 0
+                self.y = block.y - self.height
+        else:
+            self.onGround = False
+
+        self.borders() #Makes sure the player does not exit the 
+
+        if self.onGround == False:
+            self.velocity += gravity
+        self.y -= self.velocity
+        self.x += self.movex
+        WINDOW.blit(self.image, (self.x, self.y))
+        pygame.display.update()
+
+    def render(self, WINDOW):
+        WINDOW.blit(self.image, (self.x, self.y))
+###############################END PLAYER 1###################################################################
+
+################################PLAYER 2#####################################################################
+class Player2(sprite.Sprite):
+    def __init__ (self):
+        sprite.Sprite.__init__(self)
+        self.velocity = 0
+        self.onGround = False
+        self.falling = True
+        self.x = 650
+        self.y = 450
+        self.user = 2
+        self.movex = 0
+        collisionDown = False
+        self.direction = LEFT
+        
+        self.image = pygame.image.load("Player2.png")
+        self.rect = self.image.get_rect()
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+
+    def jump(self):
+                if (self.onGround == False):
+                        return
+
+                self.velocity = 13
+                self.onGround = False
+
+    def detectCollisionsDown(self, x1, y1, w1, h1, x2, y2, w2, h2):
+                if (x2+w2 >= x1 >= x2 and y2+h2 >= y1+h1 >= y2): #Top
+                        return True
+                elif (x2+w2 >= x1+w1 >= x2 and y2+h2 >= y1+h1 >= y2): #Top
+                        return True
+                else:
+                        return False
+
+    def borders(self):
+        if (self.x + self.width) >= 768: #Right border
+            self.x = 768 - self.width
+            
+        elif self.x <= 32: #left border
+            self.x = 32
+
+        if self.y <= 32: #top border
+            self.y = 32
+            self.velocity = 0 #stops upward movement
+
+    def shoot(self):
+        bullet.shoot(2, self.direction)
                     
     def update(self):
         if(self.velocity < 0):
@@ -73,6 +179,8 @@ class Player(sprite.Sprite):
         else:
             self.onGround = False
 
+        self.borders() #Makes sure the player does not exit the 
+
         if self.onGround == False:
             self.velocity += gravity
         self.y -= self.velocity
@@ -82,8 +190,37 @@ class Player(sprite.Sprite):
 
     def render(self, WINDOW):
         WINDOW.blit(self.image, (self.x, self.y))
+########################################################END PLAYER 2###########################################################3
 
+class Bullet(sprite.Sprite):
+    def __init__ (self):
+        sprite.Sprite.__init__(self)
+        self.velocity = 16
+        self.movex = 0
+        self.x = 0
+        self.y = 0
+        
+        self.image = pygame.image.load("Bullet.png")
+        self.rect = self.image.get_rect()
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
 
+    def shoot(self, player, direction): #Creating a shooting function that determines the shooter and the target
+        if player == 1:
+            if direction == RIGHT:
+                self.x = player.x + player.width
+                self.velocity = 16
+            elif direction == LEFT:
+                self.x = player.x - self.width
+                self.velocity = 16
+
+    def update(self):
+        self.x += self.velocity
+
+    def render(self, WINDOW):
+        WINDOW.blit(self.image, (self.x, self.y))
+            
+        
 class Block:
     def __init__(self, x, y):
         self.x = x
@@ -92,10 +229,16 @@ class Block:
         self.height = 32
 
     def render(self, WINDOW):
-        pygame.draw.rect(WINDOW, white, (self.x, self.y, self.width, self.height))
+        pygame.draw.rect(WINDOW, silver, (self.x, self.y, self.width, self.height))
+
+        
 
 player = Player()
 player.__init__()
+player2 = Player2()
+player2.__init__()
+bullet = Bullet()
+bullet.__init__()
 
 
 level1 = [
@@ -107,16 +250,16 @@ level1 = [
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
 blockList = []
@@ -134,27 +277,58 @@ while running:
             running = False
             pygame.quit()
             sys.exit()
-        if (event.type == KEYDOWN):
-            if (event.key == K_RIGHT):
-                player.movex = step
-            if (event.key == K_LEFT):
-                player.movex = -step
-
-            if (event.key == K_UP):
-                player.jump()
+        #####Player 1 Inputs######
+        if (player.user == 1):
+            if (event.type == KEYDOWN):
+                if (event.key == K_d):
+                    player.movex = step
+                    player.direction = RIGHT
+                elif (event.key == K_a):
+                    player.movex = -step
+                    player.direction = LEFT
+                if (event.key == K_w):
+                    player.jump()
+                if (event.key == K_SPACE):
+                    player.shoot()
+                    bulletCD = 60
                                 
         if (event.type == KEYUP):
-            if (event.key == K_RIGHT):
+            if (event.key == K_d):
                 player.movex = 0
-            if (event.key == K_LEFT):
+            if (event.key == K_a):
                 player.movex = 0
+
+        #####Player 2 Inputs######
+        if (player2.user == 2):
+            if (event.type == KEYDOWN):
+                if (event.key == K_KP6):
+                    player2.movex = step
+                    player2.direction = RIGHT
+                if (event.key == K_KP4):
+                    player2.movex = -step
+                    player2.direction = LEFT
+                if (event.key == K_KP8):
+                    player2.jump()
+                if (event.key == K_KP0):
+                    player2.shoot()
+                                    
+            if (event.type == KEYUP):
+                if (event.key == K_KP6):
+                    player2.movex = 0
+                if (event.key == K_KP4):
+                    player2.movex = 0
             
-                                
+    bulletCD = bulletCD - 1
     WINDOW.fill(black)
     for block in blockList:
         block.render(WINDOW)
+    if bulletCD > 0:
+        bullet.update()
+        bullet.render(WINDOW)
     player.update()
+    player2.update()
     player.render(WINDOW)
+    player2.render(WINDOW)
     clock.tick(FPS)
     pygame.display.update()
 
