@@ -74,10 +74,10 @@ class Player(sprite.Sprite):
         if self.y <= 32: #top border
             self.y = 32
             self.velocity = 0 #stops upward movement
-
+#########################################################
     def shoot(self):
         bullet.shoot(1, self.direction)
-                                
+  ########################################################                              
     def update(self):
         if(self.velocity < 0):
             self.falling = True
@@ -155,10 +155,10 @@ class Player2(sprite.Sprite):
         if self.y <= 32: #top border
             self.y = 32
             self.velocity = 0 #stops upward movement
-
+##########################################
     def shoot(self):
         bullet.shoot(2, self.direction)
-                    
+##########################################                    
     def update(self):
         if(self.velocity < 0):
             self.falling = True
@@ -191,7 +191,7 @@ class Player2(sprite.Sprite):
     def render(self, WINDOW):
         WINDOW.blit(self.image, (self.x, self.y))
 ########################################################END PLAYER 2###########################################################3
-
+##############################BULLET######################
 class Bullet(sprite.Sprite):
     def __init__ (self):
         sprite.Sprite.__init__(self)
@@ -206,7 +206,7 @@ class Bullet(sprite.Sprite):
         self.height = self.image.get_height()
 
     def shoot(self, player, direction): #Creating a shooting function that determines the shooter and the target
-        if player == 1:
+        if player == 1: 
             if direction == RIGHT:
                 self.x = player.x + player.width
                 self.velocity = 16
@@ -219,7 +219,7 @@ class Bullet(sprite.Sprite):
 
     def render(self, WINDOW):
         WINDOW.blit(self.image, (self.x, self.y))
-            
+  #################################################END BULLET#################################          
         
 class Block:
     def __init__(self, x, y):
@@ -288,7 +288,7 @@ while running:
                     player.direction = LEFT
                 if (event.key == K_w):
                     player.jump()
-                if (event.key == K_SPACE):
+                if (event.key == K_SPACE):##########################################################
                     player.shoot()
                     bulletCD = 60
                                 
@@ -309,7 +309,7 @@ while running:
                     player2.direction = LEFT
                 if (event.key == K_KP8):
                     player2.jump()
-                if (event.key == K_KP0):
+                if (event.key == K_KP0):###############################################################
                     player2.shoot()
                                     
             if (event.type == KEYUP):
