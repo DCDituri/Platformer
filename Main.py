@@ -1,12 +1,27 @@
 import pygame
 from pygame import *
-import sys
+from pygame import mixer
+import sys, os
 
 pygame.init()
 
 #Window Options
 WINDOW = pygame.display.set_mode([800,600])
 pygame.display.set_caption("Aww Yeah!")
+
+#Playing sounds
+folder = os.path.dirname(os.path.realpath('__file__'))
+fileName = os.path.join(folder, 'Sounds\\')
+fileName = os.path.abspath(os.path.realpath(fileName))
+namesList = ["Walk", "Jump", "Piano A", "Piano B", "Piano Bflat", "Piano C", "Piano Csharp", "Piano D", "Piano E", "Piano Eflat", "Piano F", "Piano G", "Piano Gsharp"] #name of the song files
+songList = [] #puts the song paths into a list
+for names in namesList:
+    songPath = fileName + "\\" + names + ".wav"
+    songList.append(songPath)
+
+mixer.init(frequency=22050, size=-16, channels=2, buffer=4096)
+walk = mixer.Sound(songList[0])
+jump = mixer.Sound(songList[1])
 
 #Colors
 black = (0, 0, 0)
@@ -288,15 +303,19 @@ while running:
                 if (event.key == K_d):
                     player.movex = step
                     player.direction = RIGHT
+                    walk.play()
                 elif (event.key == K_a):
                     player.movex = -step
                     player.direction = LEFT
+                    walk.play()
                 if (event.key == K_w):
                     player.jump()
+                    jump.play()
  
                 if (event.key == K_SPACE):#Will stop the program to play the music
                     print "DJ Start the music"
             if (event.type == KEYUP):
+                walk.stop()
                 if (event.key == K_d):
                     player.movex = 0
                 if (event.key == K_a):
@@ -308,13 +327,17 @@ while running:
                 if (event.key == K_RIGHT):
                     player2.movex = step
                     player2.direction = RIGHT
+                    walk.stop()
                 if (event.key == K_LEFT):
                     player2.movex = -step
                     player2.direction = LEFT
+                    walk.stop()
                 if (event.key == K_UP):
                     player2.jump()
+                    jump.play()
                                     
             if (event.type == KEYUP):
+                walk.stop()
                 if (event.key == K_RIGHT):
                     player2.movex = 0
                 if (event.key == K_LEFT):
