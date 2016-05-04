@@ -28,6 +28,8 @@ step = 5
 gravity = -0.5
 gameLoop = True
 #############################PLAYER 1###############################################
+
+
 class Player(sprite.Sprite):
     def __init__ (self):
         sprite.Sprite.__init__(self)
@@ -56,7 +58,7 @@ class Player(sprite.Sprite):
                 self.velocity = 13
                 self.onGround = False
 
-    def detectCollisionsDown(self, x1, y1, w1, h1, x2, y2, w2, h2):
+    def detectCollisions(self, x1, y1, w1, h1, x2, y2, w2, h2):
                 if (x2+w2 >= x1 >= x2 and y2+h2 >= y1+h1 >= y2): #Top
                         return True
                 elif (x2+w2 >= x1+w1 >= x2 and y2+h2 >= y1+h1 >= y2): #Top
@@ -74,17 +76,14 @@ class Player(sprite.Sprite):
         if self.y <= 32: #top border
             self.y = 32
             self.velocity = 0 #stops upward movement
-#########################################################
-    def shoot(self):
-        bullet.shoot(1, self.direction)
-  ########################################################                              
+                            
     def update(self):
         if(self.velocity < 0):
             self.falling = True
 
         #Checking for Collisions
         for block in blockList:
-            collisionDown = self.detectCollisionsDown(self.x, self.y, self.width, self.height, block.x, block.y, block.width, block.height)
+            collisionDown = self.detectCollisions(self.x, self.y, self.width, self.height, block.x, block.y, block.width, block.height)
             if (collisionDown == True):
                 break
 
@@ -97,6 +96,15 @@ class Player(sprite.Sprite):
                 self.y = block.y - self.height
         else:
             self.onGround = False
+
+        #Checking for Collection
+        for item in itemList:
+            collection = self.detectCollisions(self.x, self.y, self.width, self.height, item.x, item.y, item.width, item.height)
+            if (collection == True):
+                blockList.append(Block(item.x, item.y))
+                itemList.remove(item)
+                player1Collection.append(item.x)
+                break
 
         self.borders() #Makes sure the player does not exit the 
 
@@ -137,13 +145,15 @@ class Player2(sprite.Sprite):
                 self.velocity = 13
                 self.onGround = False
 
-    def detectCollisionsDown(self, x1, y1, w1, h1, x2, y2, w2, h2):
+    def detectCollisions(self, x1, y1, w1, h1, x2, y2, w2, h2):
                 if (x2+w2 >= x1 >= x2 and y2+h2 >= y1+h1 >= y2): #Top
                         return True
                 elif (x2+w2 >= x1+w1 >= x2 and y2+h2 >= y1+h1 >= y2): #Top
                         return True
                 else:
                         return False
+
+
 
     def borders(self):
         if (self.x + self.width) >= 768: #Right border
@@ -155,17 +165,14 @@ class Player2(sprite.Sprite):
         if self.y <= 32: #top border
             self.y = 32
             self.velocity = 0 #stops upward movement
-##########################################
-    def shoot(self):
-        bullet.shoot(2, self.direction)
-##########################################                    
+                   
     def update(self):
         if(self.velocity < 0):
             self.falling = True
 
         #Checking for Collisions
         for block in blockList:
-            collisionDown = self.detectCollisionsDown(self.x, self.y, self.width, self.height, block.x, block.y, block.width, block.height)
+            collisionDown = self.detectCollisions(self.x, self.y, self.width, self.height, block.x, block.y, block.width, block.height)
             if (collisionDown == True):
                 break
 
@@ -178,7 +185,16 @@ class Player2(sprite.Sprite):
                 self.y = block.y - self.height
         else:
             self.onGround = False
-
+            
+        #Checking for Collection
+        for item in itemList:
+            collection = self.detectCollisions(self.x, self.y, self.width, self.height, item.x, item.y, item.width, item.height)
+            if (collection == True):
+                blockList.append(Block(item.x, item.y))
+                itemList.remove(item)
+                player2Collection.append(item.x)
+                break
+            
         self.borders() #Makes sure the player does not exit the 
 
         if self.onGround == False:
@@ -190,36 +206,7 @@ class Player2(sprite.Sprite):
 
     def render(self, WINDOW):
         WINDOW.blit(self.image, (self.x, self.y))
-########################################################END PLAYER 2###########################################################3
-##############################BULLET######################
-class Bullet(sprite.Sprite):
-    def __init__ (self):
-        sprite.Sprite.__init__(self)
-        self.velocity = 16
-        self.movex = 0
-        self.x = 0
-        self.y = 0
-        
-        self.image = pygame.image.load("Bullet.png")
-        self.rect = self.image.get_rect()
-        self.width = self.image.get_width()
-        self.height = self.image.get_height()
-
-    def shoot(self, player, direction): #Creating a shooting function that determines the shooter and the target
-        if player == 1: 
-            if direction == RIGHT:
-                self.x = player.x + player.width
-                self.velocity = 16
-            elif direction == LEFT:
-                self.x = player.x - self.width
-                self.velocity = 16
-
-    def update(self):
-        self.x += self.velocity
-
-    def render(self, WINDOW):
-        WINDOW.blit(self.image, (self.x, self.y))
-  #################################################END BULLET#################################          
+########################################################END PLAYER 2###########################################################3     
         
 class Block:
     def __init__(self, x, y):
@@ -231,45 +218,63 @@ class Block:
     def render(self, WINDOW):
         pygame.draw.rect(WINDOW, silver, (self.x, self.y, self.width, self.height))
 
-        
+
+class Items:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.width = 32
+        self.height = 32
+
+    def render(self, WINDOW):
+        pygame.draw.rect(WINDOW, scarlet, (self.x, self.y, self.width, self.height))
+
+
+def levelRender():
+
+    level1 = [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    ]
+    
+
+    for y in range (0, len(level1)):
+        for x in range (0, len(level1[y])):
+            if (level1[y][x]==1):
+                blockList.append(Block(x*32, y*32))
+
+    for y in range (0, len(level1)):
+        for x in range (0, len(level1[y])):
+            if (level1[y][x]==2):
+                itemList.append(Items(x*32, y*32))
+
+blockList = []
+itemList = []
+player1Collection = []
+player2Collection = []
 
 player = Player()
 player.__init__()
 player2 = Player2()
 player2.__init__()
-bullet = Bullet()
-bullet.__init__()
-
-
-level1 = [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-]
-blockList = []
-
-for y in range (0, len(level1)):
-    for x in range (0, len(level1[y])):
-        if (level1[y][x]==1):
-            blockList.append(Block(x*32, y*32))
-
-
+levelRender()
 
 while running:
     for event in pygame.event.get():
@@ -288,48 +293,44 @@ while running:
                     player.direction = LEFT
                 if (event.key == K_w):
                     player.jump()
-                if (event.key == K_SPACE):##########################################################
-                    player.shoot()
-                    bulletCD = 60
-                                
-        if (event.type == KEYUP):
-            if (event.key == K_d):
-                player.movex = 0
-            if (event.key == K_a):
-                player.movex = 0
+ 
+                if (event.key == K_SPACE):#Will stop the program to play the music
+                    print "DJ Start the music"
+            if (event.type == KEYUP):
+                if (event.key == K_d):
+                    player.movex = 0
+                if (event.key == K_a):
+                    player.movex = 0
 
         #####Player 2 Inputs######
         if (player2.user == 2):
             if (event.type == KEYDOWN):
-                if (event.key == K_KP6):
+                if (event.key == K_RIGHT):
                     player2.movex = step
                     player2.direction = RIGHT
-                if (event.key == K_KP4):
+                if (event.key == K_LEFT):
                     player2.movex = -step
                     player2.direction = LEFT
-                if (event.key == K_KP8):
+                if (event.key == K_UP):
                     player2.jump()
-                if (event.key == K_KP0):###############################################################
-                    player2.shoot()
                                     
             if (event.type == KEYUP):
-                if (event.key == K_KP6):
+                if (event.key == K_RIGHT):
                     player2.movex = 0
-                if (event.key == K_KP4):
+                if (event.key == K_LEFT):
                     player2.movex = 0
             
-    bulletCD = bulletCD - 1
     WINDOW.fill(black)
+    for item in itemList:
+        item.render(WINDOW)
     for block in blockList:
         block.render(WINDOW)
-    if bulletCD > 0:
-        bullet.update()
-        bullet.render(WINDOW)
     player.update()
     player2.update()
     player.render(WINDOW)
     player2.render(WINDOW)
     clock.tick(FPS)
     pygame.display.update()
+    print itemList
 
 
