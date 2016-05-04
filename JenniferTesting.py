@@ -1,4 +1,36 @@
-import shutil
+import wave
+from pygame import mixer
+import os
+
+
+folder = os.path.dirname(os.path.realpath('__file__'))
+fileName = os.path.join(folder, '..Platformer/Sounds/')
+fileName = os.path.abspath(os.path.realpath(fileName))
+namesList = ["chicken", "duck", "cat", "sheep"] #name of the song files
+songList = [] #puts the song paths into a list
+for names in namesList:
+    songPath = fileName + "\\" + names + ".wav"
+    songList.append(songPath)
+print songList
+
+
+"""
+import sys, pygame
+from pygame.locals import *
+
+import pygame.mixer
+
+folder = os.path.dirname(os.path.realpath('__file__'))
+fileName = os.path.join(folder, '..Platformer/Sounds/')
+fileName = os.path.abspath(os.path.realpath(fileName))
+
+pygame.mixer.init()
+sound = pygame.mixer.Sound("C:\\Users\\Jennifer Nguyen\\Documents\\GitHub\\Platformer\\Sounds\\chicken.wav")
+sound.play()
+"""
+
+
+"""import shutil
 from pygame import mixer
 import sys
 
@@ -22,6 +54,7 @@ mixer.music.play()
 
 duck.close()
 newSong.close()
+"""
 
 
 
