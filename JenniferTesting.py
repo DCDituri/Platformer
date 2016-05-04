@@ -1,18 +1,22 @@
-import wave
+import wave, pygame
 from pygame import mixer
+from pygame import *
 import os
 
 
 folder = os.path.dirname(os.path.realpath('__file__'))
-fileName = os.path.join(folder, '..Platformer/Sounds/')
+fileName = os.path.join(folder, 'Sounds\\')
 fileName = os.path.abspath(os.path.realpath(fileName))
-namesList = ["chicken", "duck", "cat", "sheep"] #name of the song files
+namesList = ["A", "B", "Bflat", "C", "Csharp", "D", "E", "Eflat", "F", "G", "Gsharp"] #name of the song files
 songList = [] #puts the song paths into a list
 for names in namesList:
-    songPath = fileName + "\\" + names + ".wav"
+    songPath = fileName + "\\Piano " + names + ".wav"
     songList.append(songPath)
 print songList
+mixer.init(frequency=22050, size=-16, channels=2, buffer=4096)
 
+song = mixer.Sound(songList[1])
+song.play()
 
 """
 import sys, pygame
