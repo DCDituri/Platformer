@@ -327,11 +327,11 @@ while running:
                 if (event.key == K_RIGHT):
                     player2.movex = step
                     player2.direction = RIGHT
-                    walk.stop()
+                    walk.play()
                 if (event.key == K_LEFT):
                     player2.movex = -step
                     player2.direction = LEFT
-                    walk.stop()
+                    walk.play()
                 if (event.key == K_UP):
                     player2.jump()
                     jump.play()
