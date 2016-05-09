@@ -35,13 +35,19 @@ RIGHT = "right"
 LEFT = "left"
 
 running = True
-FPS = 60
+FPS = 120
 bulletCD = 0
 clock = pygame.time.Clock()
 
 step = 5
 gravity = -0.5
 gameLoop = True
+GAMESTART = 1
+GAMERUNNING = 2
+GAMEFINISHED = 3
+GAMEQUIT = 4
+STATUS = GAMESTART
+
 #############################PLAYER 1###############################################
 
 
@@ -60,6 +66,7 @@ class Player(sprite.Sprite):
         self.user = 1
         self.direction = RIGHT
         self.bulletCount = 0
+        self.collect = 0
         
         self.image = pygame.image.load("Player1.png")
         self.rect = self.image.get_rect()
@@ -118,7 +125,7 @@ class Player(sprite.Sprite):
             if (collection == True):
                 blockList.append(Block(item.x, item.y))
                 itemList.remove(item)
-                player1Collection.append(item.x)
+                self.collect = self.collect + 1
                 break
 
         self.borders() #Makes sure the player does not exit the 
@@ -147,6 +154,7 @@ class Player2(sprite.Sprite):
         self.movex = 0
         collisionDown = False
         self.direction = LEFT
+        self.collect = 0
         
         self.image = pygame.image.load("Player2.png")
         self.rect = self.image.get_rect()
@@ -207,7 +215,7 @@ class Player2(sprite.Sprite):
             if (collection == True):
                 blockList.append(Block(item.x, item.y))
                 itemList.remove(item)
-                player2Collection.append(item.x)
+                self.collect = self.collect + 1
                 break
             
         self.borders() #Makes sure the player does not exit the 
@@ -254,14 +262,14 @@ def levelRender():
             [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 2, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -280,10 +288,22 @@ def levelRender():
             if (level1[y][x]==2):
                 itemList.append(Items(x*32, y*32))
 
+while STATUS == GAMESTART:
+    titleScreen  = pygame.image.load("TitleScreen.jpg")
+    WINDOW.blit(titleScreen, (0, 0))
+    pygame.display.update()
+    for event in pygame. event.get():
+        if (event.type == QUIT):
+            STATUS = GAMEQUIT
+            pygame.quit()
+            sys.exit()
+        if (event.type == KEYDOWN):
+            if (event.key == K_SPACE):
+                STATUS = GAMERUNNING
+    
+
 blockList = []
 itemList = []
-player1Collection = []
-player2Collection = []
 
 player = Player()
 player.__init__()
@@ -291,10 +311,10 @@ player2 = Player2()
 player2.__init__()
 levelRender()
 
-while running:
+while STATUS == GAMERUNNING:
     for event in pygame.event.get():
         if (event.type==QUIT):
-            running = False
+            STATUS = GAMEQUIT
             pygame.quit()
             sys.exit()
         #####Player 1 Inputs######
@@ -355,5 +375,22 @@ while running:
     clock.tick(FPS)
     pygame.display.update()
     print itemList
+    if itemList == []:
+        STATUS = GAMEFINISHED
+
+    while STATUS == GAMEFINISHED:
+        if player.collect > player2.collect:
+            endScreen = pygame.image.load("player1victory.jpg")
+        elif player2.collect > player.collect:
+            endScreen = pygame.image.load("player2victory.jpg")
+        else:
+            endScreen = pygame.image.load("novictory.jpg")
+        WINDOW.blit(endScreen, (0, 0))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if (event.type==QUIT):
+                STATUS = GAMEQUIT
+                pygame.quit()
+                sys.exit()
 
 
