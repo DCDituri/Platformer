@@ -13,7 +13,7 @@ pygame.display.set_caption("Aww Yeah!")
 folder = os.path.dirname(os.path.realpath('__file__'))
 fileName = os.path.join(folder, 'Sounds\\')
 fileName = os.path.abspath(os.path.realpath(fileName))
-namesList = ["Walk", "Jump", "Piano A", "Piano B", "Piano Bflat", "Piano C", "Piano Csharp", "Piano D", "Piano E", "Piano Eflat", "Piano F", "Piano G", "Piano Gsharp"] #name of the song files
+namesList = ["Walk", "Jump", "Background", "Blast"] #name of the song files
 songList = [] #puts the song paths into a list
 for names in namesList:
     songPath = fileName + "\\" + names + ".wav"
@@ -22,6 +22,8 @@ for names in namesList:
 mixer.init(frequency=22050, size=-16, channels=2, buffer=4096)
 walk = mixer.Sound(songList[0])
 jump = mixer.Sound(songList[1])
+bg = mixer.Sound(songList[2])
+blast = mixer.Sound(songList[3])
 
 #Colors
 black = (0, 0, 0)
@@ -35,7 +37,7 @@ RIGHT = "right"
 LEFT = "left"
 
 running = True
-FPS = 120
+FPS = 60
 bulletCD = 0
 clock = pygame.time.Clock()
 
@@ -126,6 +128,7 @@ class Player(sprite.Sprite):
                 blockList.append(Block(item.x, item.y))
                 itemList.remove(item)
                 self.collect = self.collect + 1
+                blast.play()
                 break
 
         self.borders() #Makes sure the player does not exit the 
@@ -216,6 +219,7 @@ class Player2(sprite.Sprite):
                 blockList.append(Block(item.x, item.y))
                 itemList.remove(item)
                 self.collect = self.collect + 1
+                blast.play()
                 break
             
         self.borders() #Makes sure the player does not exit the 
@@ -312,6 +316,7 @@ player2.__init__()
 levelRender()
 
 while STATUS == GAMERUNNING:
+    bg.play()
     for event in pygame.event.get():
         if (event.type==QUIT):
             STATUS = GAMEQUIT
@@ -323,11 +328,11 @@ while STATUS == GAMERUNNING:
                 if (event.key == K_d):
                     player.movex = step
                     player.direction = RIGHT
-                    walk.play()
+                    walk.play(loops=-1)
                 elif (event.key == K_a):
                     player.movex = -step
                     player.direction = LEFT
-                    walk.play()
+                    walk.play(loops=-1)
                 if (event.key == K_w):
                     player.jump()
                     jump.play()
@@ -347,11 +352,11 @@ while STATUS == GAMERUNNING:
                 if (event.key == K_RIGHT):
                     player2.movex = step
                     player2.direction = RIGHT
-                    walk.play()
+                    walk.play(loops=-1)
                 if (event.key == K_LEFT):
                     player2.movex = -step
                     player2.direction = LEFT
-                    walk.play()
+                    walk.play(loops=-1)
                 if (event.key == K_UP):
                     player2.jump()
                     jump.play()
