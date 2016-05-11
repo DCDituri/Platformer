@@ -379,7 +379,6 @@ while STATUS == GAMERUNNING:
     player2.render(WINDOW)
     clock.tick(FPS)
     pygame.display.update()
-    print itemList
     if itemList == []:
         STATUS = GAMEFINISHED
 
@@ -397,5 +396,19 @@ while STATUS == GAMERUNNING:
                 STATUS = GAMEQUIT
                 pygame.quit()
                 sys.exit()
+            if (event.type==KEYDOWN):
+                if event.key == K_SPACE:
+                    for block in blockList:
+                        blockList.remove(block)
+                    for item in itemList:
+                        itemList.remove(item)
+                    levelRender()
+                    player.x = 50
+                    player.y = 450
+                    player.collect = 0
+                    player2.x = 650
+                    player2.y = 450
+                    player2.collect = 0
+                    STATUS = GAMERUNNING
 
 
