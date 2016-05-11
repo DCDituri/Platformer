@@ -13,8 +13,7 @@ pygame.display.set_caption("Aww Yeah!")
 folder = os.path.dirname(os.path.realpath('__file__'))
 fileName = os.path.join(folder, 'Sounds\\')
 fileName = os.path.abspath(os.path.realpath(fileName))
-namesList = ["Walk", "Jump", "Piano A", "Piano B", "Piano Bflat", "Piano C", "Piano Csharp", "Piano D", "Piano E", "Piano Eflat", "Piano F", "Piano G", "Piano Gsharp"] #name of the song files
-#namesList = ["Walk", "Jump", "Background", "Blast"] #name of the song files
+namesList = ["Walk", "Jump", "Background", "Blast"] #name of the song files
 songList = [] #puts the song paths into a list
 for names in namesList:
     songPath = fileName + "\\" + names + ".wav"
