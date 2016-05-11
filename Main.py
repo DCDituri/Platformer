@@ -13,7 +13,8 @@ pygame.display.set_caption("Aww Yeah!")
 folder = os.path.dirname(os.path.realpath('__file__'))
 fileName = os.path.join(folder, 'Sounds\\')
 fileName = os.path.abspath(os.path.realpath(fileName))
-namesList = ["Walk", "Jump", "Background", "Blast"] #name of the song files
+namesList = ["Walk", "Jump", "Piano A", "Piano B", "Piano Bflat", "Piano C", "Piano Csharp", "Piano D", "Piano E", "Piano Eflat", "Piano F", "Piano G", "Piano Gsharp"] #name of the song files
+#namesList = ["Walk", "Jump", "Background", "Blast"] #name of the song files
 songList = [] #puts the song paths into a list
 for names in namesList:
     songPath = fileName + "\\" + names + ".wav"
@@ -70,7 +71,7 @@ class Player(sprite.Sprite):
         self.bulletCount = 0
         self.collect = 0
         
-        self.image = pygame.image.load("Player1.png")
+        self.image = pygame.image.load("BlueSpartan.png")
         self.rect = self.image.get_rect()
         self.width = self.image.get_width()
         self.height = self.image.get_height()
@@ -159,7 +160,7 @@ class Player2(sprite.Sprite):
         self.direction = LEFT
         self.collect = 0
         
-        self.image = pygame.image.load("Player2.png")
+        self.image = pygame.image.load("RedSpartan.png")
         self.rect = self.image.get_rect()
         self.width = self.image.get_width()
         self.height = self.image.get_height()
@@ -252,10 +253,11 @@ class Items:
         self.y = y
         self.width = 32
         self.height = 32
+        self.image = pygame.image.load("Note.png")
 
     def render(self, WINDOW):
-        pygame.draw.rect(WINDOW, scarlet, (self.x, self.y, self.width, self.height))
-
+        pygame.draw.rect(WINDOW, silver, (self.x, self.y, self.width, self.height))
+        WINDOW.blit(self.image, (self.x, self.y))
 
 def levelRender():
 
@@ -412,5 +414,3 @@ while STATUS == GAMERUNNING:
                     player2.y = 450
                     player2.collect = 0
                     STATUS = GAMERUNNING
-
-
